@@ -78,7 +78,8 @@ def fail(step, why):
 
 def run(step, cmd, **kw):
     print("  $", " ".join(str(c) for c in cmd), flush=True)
-    r = subprocess.run([str(c) for c in cmd], **kw)
+    sys.stdout.flush()   # pass output on explicitly: a background (detached) job loses its children's output otherwise
+    r = subprocess.run([str(c) for c in cmd], stdout=sys.stdout, stderr=subprocess.STDOUT, **kw)
     if r.returncode:
         fail(step, f"this command failed (exit {r.returncode}): {' '.join(str(c) for c in cmd[:4])} ...")
 
