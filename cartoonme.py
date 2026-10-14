@@ -18,6 +18,7 @@ FLUX_PY = os.environ.get("FLUX_PYTHON", sys.executable)
 HAND_MODEL = HERE / "models/hand_landmarker.task"
 HAND_URL = "https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task"
 FPS = 30
+os.environ.setdefault("PYTHONIOENCODING", "utf-8")  # LivePortrait prints emoji; Windows crashes on them when output is captured
 
 def run(cmd, **kw):
     r = subprocess.run([str(c) for c in cmd], **kw)

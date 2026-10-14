@@ -12,30 +12,25 @@ If you use an AI coding tool (Claude Code, Codex, Cursor), open it in an empty f
 
 > Set this up for me: https://github.com/coding-island-js/cartoon-me
 
-It reads [`SETUP-WITH-AI.md`](SETUP-WITH-AI.md), checks your computer, installs everything and runs a test.
+It reads [`SETUP-WITH-AI.md`](SETUP-WITH-AI.md) and runs one installer that checks your computer, installs everything and makes a test video.
 
 ## What you need
 
 - A Windows or Linux PC with an NVIDIA graphics card. Built and tested on an RTX 4090 (24 GB). Smaller cards: not tested yet.
-- About 20 GB of free disk space for the models.
+- About 30 GB of free disk space (models plus two Python environments).
 - Newer Macs (M1 and up): should work, slower. Not tested yet. If you try it, open an issue and tell me.
 
 ## Do it yourself
 
 1. Install Python 3.12, [ffmpeg](https://ffmpeg.org/download.html) and git.
-2. Get this repo and its tools:
+2. Get this repo and run the installer:
    ```
    git clone https://github.com/coding-island-js/cartoon-me
-   git clone https://github.com/KwaiVGI/LivePortrait
+   cd cartoon-me
+   python install.py
    ```
-   Follow LivePortrait's own install steps inside `LivePortrait/` (it has its own Python environment and downloads its own weights).
-3. In `cartoon-me/`:
-   ```
-   python -m venv .venv
-   .venv\Scripts\activate          (Mac/Linux: source .venv/bin/activate)
-   pip install torch --index-url https://download.pytorch.org/whl/cu128
-   pip install -r requirements.txt
-   ```
+   It gets LivePortrait, makes its own Python environments (never your main Python), downloads the models and makes a test video. The first run takes 20 to 60 minutes. The last line says PASS or FAIL, and a FAIL says which step and why.
+3. Turn on its Python environment: `.venv\Scripts\activate` (Mac/Linux: `source .venv/bin/activate`).
 4. Draw your cartoon. It makes a few versions and a sheet to pick from:
    ```
    python cartoonme.py draw my_video.mp4 --at 1.0 --describe "grey beard, black polo shirt"
