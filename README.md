@@ -16,6 +16,28 @@ It reads [`SETUP-WITH-AI.md`](SETUP-WITH-AI.md) and runs one installer that chec
 
 **For the AI tool:** clone the repo, `cd cartoon-me`, run `python install.py --background` (it returns at once), then run `python install.py --status` every few minutes until it says PASS or FAIL. It takes 20 to 60 minutes. Do not install anything else yourself, and do not say it is set up until `--status` says PASS. Details: [`SETUP-WITH-AI.md`](SETUP-WITH-AI.md).
 
+### No AI subscription? Use a free one on your own PC
+
+Tested: [OpenCode](https://opencode.ai) running gpt-oss 20B through [Ollama](https://ollama.com) set this up on its own, no paid AI. (Qwen3 30B did not: it said "done" when it wasn't.)
+
+1. Install Ollama and OpenCode (`npm i -g opencode-ai`), then `ollama pull gpt-oss:20b` (13 GB).
+2. Give the model room to work. Save this as `Modelfile`, then run `ollama create gpt-oss-20b-32k -f Modelfile`:
+   ```
+   FROM gpt-oss:20b
+   PARAMETER num_ctx 32768
+   ```
+3. In an empty folder, save this as `opencode.json`:
+   ```json
+   {
+     "provider": { "ollama": { "npm": "@ai-sdk/openai-compatible", "options": { "baseURL": "http://localhost:11434/v1" },
+                               "models": { "gpt-oss-20b-32k": { "tools": true } } } },
+     "model": "ollama/gpt-oss-20b-32k"
+   }
+   ```
+4. Run `opencode` there and say the line above. If it only lists the commands, say "go ahead". Then ask "is it done?" every few minutes until it says PASS.
+
+The model and the installer share the graphics card. The installer unloads the model while it runs its test, and Ollama loads it again by itself.
+
 ## What you need
 
 - A Windows or Linux PC with an NVIDIA graphics card. Built and tested on an RTX 4090 (24 GB). Smaller cards: not tested yet.
