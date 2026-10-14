@@ -49,6 +49,8 @@ if "--background" in sys.argv:
     print(f"Started. It takes 20-60 minutes. Check it with:  python install.py --status")
     sys.exit(0)
 if "--status" in sys.argv:
+    # check the process first, then read the log: a job that just finished has already written PASS or FAIL
+    dead = PID.exists() and not alive(int(PID.read_text()))
     lines = LOG.read_text(encoding="utf-8", errors="replace").splitlines() if LOG.exists() else []
     if not lines:
         print("NOT STARTED. Run:  python install.py --background"); sys.exit(0)
@@ -58,7 +60,7 @@ if "--status" in sys.argv:
         print("\n".join(lines[-9:]))
     elif any(l.startswith("FAIL at step") for l in lines):
         print(next(l for l in lines if l.startswith("FAIL at step")))
-    elif PID.exists() and not alive(int(PID.read_text())):
+    elif dead:
         print(f"STOPPED before finishing (last: {steps[-1] if steps else last}). Run again:  python install.py --background")
     else:
         print(f"RUNNING: {steps[-1][3:] if steps else 'starting'}\nlast line: {last[-200:]}\nCheck again in a few minutes:  python install.py --status")
