@@ -3,3 +3,5 @@ models/
 *.mp4
 .venv/
 __pycache__/
+install.log
+install.pid

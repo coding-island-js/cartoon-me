@@ -11,17 +11,21 @@ cd cartoon-me
 
 ## 2. Run the installer
 ```
-python install.py
+python install.py --background
 ```
-On Windows, if `python` is not 3.10 to 3.12, use `py -3.12 install.py`.
+It returns at once and keeps installing on its own (20 to 60 minutes, about 20 GB of downloads). Then check it every few minutes:
+```
+python install.py --status
+```
+On Windows, if `python` is not 3.10 to 3.12, use `py -3.12` instead of `python` in both commands.
 
-It takes 20 to 60 minutes the first time (about 20 GB of downloads). Let it finish. If your tool stops commands after a few minutes, run it in the background instead, `python install.py > install.log 2>&1`, and read the end of `install.log` every few minutes until the last line is PASS or FAIL. If it gets cut off anyway, run it again: it skips what is already done. It checks the computer, gets LivePortrait into `../LivePortrait`, makes two separate Python environments, downloads the models, and makes a short test video.
+It checks the computer, gets LivePortrait into `../LivePortrait`, makes two separate Python environments, downloads the models, and makes a short test video. Keep checking until it says PASS or FAIL. If it says STOPPED, run `python install.py --background` again: it skips what is already done.
 
-## 3. Read the last line
+## 3. Read the status
 - **`PASS`**: setup worked. Tell the person, and show them the "To use it on your own video" lines it printed.
-- **`FAIL at step N: ...`**: tell the person that line, word for word. If it says something is missing (git, ffmpeg, Python), offer to install that one thing with winget, brew or apt, ask first, then run `python install.py` again. It skips what is already done.
+- **`FAIL at step N: ...`**: tell the person that line, word for word. If it says something is missing (git, ffmpeg, Python), offer to install that one thing with winget, brew or apt, ask first, then run `python install.py --background` again. It skips what is already done.
 
-Never tell the person it is set up unless the last line says PASS.
+Never tell the person it is set up unless `--status` says PASS.
 
 ## 4. Their first video
 Ask for a short clip of them talking (10 to 20 seconds, facing the camera). Then, inside `cartoon-me` with `.venv` active:

@@ -14,6 +14,8 @@ If you use an AI coding tool (Claude Code, Codex, Cursor), open it in an empty f
 
 It reads [`SETUP-WITH-AI.md`](SETUP-WITH-AI.md) and runs one installer that checks your computer, installs everything and makes a test video.
 
+**For the AI tool:** clone the repo, `cd cartoon-me`, run `python install.py --background` (it returns at once), then run `python install.py --status` every few minutes until it says PASS or FAIL. It takes 20 to 60 minutes. Do not install anything else yourself, and do not say it is set up until `--status` says PASS. Details: [`SETUP-WITH-AI.md`](SETUP-WITH-AI.md).
+
 ## What you need
 
 - A Windows or Linux PC with an NVIDIA graphics card. Built and tested on an RTX 4090 (24 GB). Smaller cards: not tested yet.

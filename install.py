@@ -1,6 +1,8 @@
 """install.py: set up cartoon-me in one command, then prove it works.
 
-  python install.py
+  python install.py                  (in a terminal: shows everything as it goes)
+  python install.py --background     (for AI tools: starts it and returns at once, output in install.log)
+  python install.py --status         (RUNNING, PASS or FAIL)
 
 It does every step in order and stops at the first one that fails, saying which and why:
   1. checks the computer (Python 3.10-3.12, git, ffmpeg, NVIDIA card, disk)
@@ -22,6 +24,45 @@ TORCH_INDEX = "https://download.pytorch.org/whl/cu128"
 TEST = HERE / "work" / "_install_test"
 # LivePortrait prints emoji. On Windows that crashes when an AI tool captures the output, unless Python writes UTF-8.
 os.environ["PYTHONUTF8"] = "1"; os.environ["PYTHONIOENCODING"] = "utf-8"
+LOG, PID = HERE / "install.log", HERE / "install.pid"
+
+
+def alive(pid):
+    if WIN:
+        return str(pid) in subprocess.run(["tasklist", "/FI", f"PID eq {pid}", "/NH"], capture_output=True, text=True).stdout
+    try:
+        os.kill(pid, 0); return True
+    except OSError:
+        return False
+
+
+# AI tools stop any command after a few minutes and the install takes 20-60. These two return in seconds.
+if "--background" in sys.argv:
+    flags = (0x00000008 | 0x00000200 | 0x01000000) if WIN else 0   # detached, own group, out of the tool's job
+    with open(LOG, "w") as log:
+        kw = dict(stdout=log, stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL, cwd=HERE)
+        try:
+            p = subprocess.Popen([sys.executable, "-u", __file__], creationflags=flags, start_new_session=not WIN, **kw)
+        except OSError:   # the tool's job does not allow breaking away
+            p = subprocess.Popen([sys.executable, "-u", __file__], creationflags=flags & ~0x01000000, start_new_session=not WIN, **kw)
+    PID.write_text(str(p.pid))
+    print(f"Started. It takes 20-60 minutes. Check it with:  python install.py --status")
+    sys.exit(0)
+if "--status" in sys.argv:
+    lines = LOG.read_text(encoding="utf-8", errors="replace").splitlines() if LOG.exists() else []
+    if not lines:
+        print("NOT STARTED. Run:  python install.py --background"); sys.exit(0)
+    steps = [l for l in lines if l.startswith("== ")]
+    last = next((l for l in reversed(lines) if l.strip()), "")
+    if last == "PASS":
+        print("\n".join(lines[-9:]))
+    elif any(l.startswith("FAIL at step") for l in lines):
+        print(next(l for l in lines if l.startswith("FAIL at step")))
+    elif PID.exists() and not alive(int(PID.read_text())):
+        print(f"STOPPED before finishing (last: {steps[-1] if steps else last}). Run again:  python install.py --background")
+    else:
+        print(f"RUNNING: {steps[-1][3:] if steps else 'starting'}\nlast line: {last[-200:]}\nCheck again in a few minutes:  python install.py --status")
+    sys.exit(0)
 
 
 def say(msg):
